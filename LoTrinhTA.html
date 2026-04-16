@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC 500 - Lộ Trình Thực Chiến 90 Ngày</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --container-bg: #2d2d2d;
+            --text-main: #d4d4d4;
+            --text-muted: #858585;
+            --accent-color: #007acc;
+            --success-color: #4CAF50;
+            --border-color: #404040;
+            --phase1-color: #e3a936;
+            --phase2-color: #36b6e3;
+            --phase3-color: #e34c36;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .progress-container {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .phase-title {
+            padding-left: 10px;
+            margin-top: 40px;
+            color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .phase-1 { border-left: 4px solid var(--phase1-color); }
+        .phase-2 { border-left: 4px solid var(--phase2-color); }
+        .phase-3 { border-left: 4px solid var(--phase3-color); }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .day-card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+
+        .day-card.completed {
+            border-color: var(--success-color);
+            background-color: #253325;
+            opacity: 0.8;
+        }
+
+        .day-card.completed .day-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .checkbox-wrapper {
+            margin-top: 2px;
+        }
+
+        input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--success-color);
+            cursor: pointer;
+        }
+
+        .day-content {
+            flex: 1;
+        }
+
+        .day-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .day-task {
+            font-size: 0.95em;
+            color: #ccc;
+        }
+
+        .relax-day {
+            border-color: #555;
+            background-color: #2a2a2a;
+        }
+        
+        .relax-day .day-title {
+            color: #e3a936;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 40px auto;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: #ff5252;
+            border: 1px solid #ff5252;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .reset-btn:hover {
+            background-color: #ff5252;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🚀 Hệ thống Target TOEIC 500 (90 Days)</h1>
+        <div class="subtitle">1 Tháng 30 Ngày - Nạp Từ Vựng 10 từ/ngày là bắt buộc xuyên suốt</div>
+
+        <div class="progress-container">
+            <div class="progress-info">
+                <span>Tiến độ biên dịch (Execution)</span>
+                <span id="progress-text">0 / 90 Ngày (0%)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="content"></div>
+
+        <button class="reset-btn" onclick="resetProgress()">Xóa dữ liệu (Reset Hệ thống)</button>
+    </div>
+
+    <script>
+        // Mảng chứa data chính xác cho 90 ngày (Mỗi tháng đúng 30 ngày)
+        const exactTasks = [
+            // --- THÁNG 1: 30 Ngày ---
+            "Ngữ pháp: Thì Hiện tại đơn & HT Tiếp diễn. Nghe: Bảng nguyên âm IPA.",
+            "Ngữ pháp: Thì Quá khứ đơn & Tương lai đơn. Nghe: Bảng phụ âm IPA.",
+            "Ngữ pháp: Thì Hiện tại hoàn thành (Đặc biệt chú ý For/Since/Yet).",
+            "Ngữ pháp: Review 5 Thì cơ bản. Làm 30 câu trắc nghiệm trộn lẫn các thì.",
+            "Từ loại: Danh từ (Vị trí đứng, các đuôi -tion, -ment, -ness, -ity).",
+            "Từ loại: Tính từ (Vị trí đứng, các đuôi -ful, -less, -ive, -al).",
+            "Nghỉ ngơi. Nghe 1 bài nhạc/Podcast tiếng Anh thụ động.",
+            "Từ loại: Trạng từ (-ly). Cấu trúc: Động từ + Trạng từ, Tính từ + Trạng từ.",
+            "Làm bài tập: Mix xác định 3 loại Danh - Tính - Trạng trong câu (Rất quan trọng cho Part 5).",
+            "Ngữ pháp: Câu bị động (Passive Voice) các thì cơ bản (Am/is/are + V3/ed).",
+            "Ngữ pháp: Các dạng So sánh (Bằng, Hơn, Nhất). Dấu hiệu: as...as, than, the most.",
+            "Kỹ năng: Mẹo giải nhanh Part 5. Cứ thấy mạo từ (a/an/the) thì tìm Danh từ.",
+            "Kỹ năng: Luyện giải 30 câu Part 5 áp dụng mẹo nhìn đuôi từ loại.",
+            "Nghỉ ngơi. Review lại toàn bộ lỗi sai khi làm bài tập từ loại tuần trước.",
+            "Nghe: Giới thiệu Part 1 (Tranh tả người). Cấu trúc: S + is/are + V_ing.",
+            "Nghe: Luyện 20 câu Part 1 tranh tả người. Ghi chép các động từ hành động.",
+            "Nghe: Part 1 (Tranh tả vật/Phong cảnh). Chú ý câu bị động: S + have/has been + V3/ed.",
+            "Nghe: Giới thiệu Part 2 (Hỏi & Đáp). Luyện dạng câu hỏi WHO và WHERE.",
+            "Nghe: Part 2. Luyện dạng câu hỏi WHEN và WHY. Chú ý bẫy từ đồng âm.",
+            "Nghe: Luyện nghe chép chính tả 10 câu Part 2 bị sai nhiều nhất.",
+            "Nghỉ ngơi. Dọn dẹp lại flashcard Anki, xóa những từ đã thuộc lòng.",
+            "Tổng ôn: Đọc lại lý thuyết Ngữ pháp 3 tuần qua (Thì, Từ loại, Bị động).",
+            "Mini Test 1: Bấm giờ làm 30 câu Part 5 và 10 câu Part 1.",
+            "Debug Mini Test 1: Sửa chi tiết tại sao đúng, tại sao sai. Tra mọi từ vựng mới.",
+            "Kỹ năng: Học cách phân biệt Đại từ (I/me/my/mine) và Đại từ phản thân (myself).",
+            "Ngữ pháp: Liên từ (And, But, Or, So, Because, Although). Phân biệt Because và Because of.",
+            "Ngữ pháp: Giới từ (In, On, At chỉ thời gian/nơi chốn).",
+            "Nghỉ ngơi. Chốt kiến thức lõi.",
+            "Tổng ôn Tháng 1: Review toàn bộ từ vựng đã học. Đọc lại sổ tay lỗi sai.",
+            "Buffer Day: Xả não hoàn toàn. Nghỉ ngơi để chuẩn bị sang Tháng 2 (Module Integration).",
+
+            // --- THÁNG 2: 30 Ngày ---
+            "Nghe: Luyện tập Part 2 - Dạng câu hỏi WHAT/HOW. Lập bảng các cách trả lời.",
+            "Nghe: Luyện tập Part 2 - Câu hỏi Yes/No, Câu hỏi đuôi. Chú ý ngữ điệu.",
+            "Đọc: Giới thiệu Part 6. Luyện làm 2 đoạn văn điền từ Part 6.",
+            "Đọc: Kỹ năng Kỹ năng Skimming (Đọc lướt tìm ý chính) cho Part 7.",
+            "Đọc: Kỹ năng Scanning (Quét tìm từ khóa cụ thể: ngày tháng, tên riêng) cho Part 7.",
+            "Đọc: Part 7 Đoạn đơn - Thể loại Email / Thư tín (Letter).",
+            "Nghỉ ngơi. Nghe lại các câu Part 2 đã sai trong tuần.",
+            "Đọc: Part 7 Đoạn đơn - Thể loại Quảng cáo (Advertisement) / Thông báo (Notice).",
+            "Đọc: Part 7 Đoạn đơn - Thể loại Tin nhắn (Text message/Online chat).",
+            "Nghe: Giới thiệu Part 3 (Hội thoại ngắn). Cách đọc trước câu hỏi bắt keyword.",
+            "Nghe: Part 3 - Thể loại hội thoại 2 người (Nơi làm việc, nhà hàng, mua sắm).",
+            "Nghe: Part 3 - Thể loại hội thoại 3 người (Khó hơn, tập trung phân biệt giọng nam/nữ).",
+            "Nghe & Đọc: Mix làm 1 đoạn Part 3 và 1 đoạn Part 7 đơn.",
+            "Nghỉ ngơi. Review lại các bẫy thường gặp trong Part 3.",
+            "Nghe: Giới thiệu Part 4 (Bài nói độc thoại).",
+            "Nghe: Part 4 - Thể loại Thông báo sân bay, nhà ga, công ty.",
+            "Nghe: Part 4 - Thể loại Tin nhắn ghi âm (Voicemail).",
+            "Đọc: Part 7 Đoạn kép (Double Passages). Cách đối chiếu thông tin giữa 2 đoạn.",
+            "Đọc: Luyện tập giải 2 bài Part 7 Đoạn kép. Tập trung độ chính xác, chưa cần ép thời gian.",
+            "Tổng hợp: Luyện giải 40 câu Part 5 tập trung vào Từ vựng (Vocabulary).",
+            "Nghỉ ngơi. Tổng hợp các từ vựng hay xuất hiện trong Part 7.",
+            "Mini Test 2 (Listening): Làm Part 1 & Part 2 liên tục không nghỉ.",
+            "Debug Listening: Dành 1 tiếng tra từ, nghe đi nghe lại câu sai.",
+            "Mini Test 3 (Reading): Làm Part 5 & Part 6 trong vòng 20 phút.",
+            "Debug Reading: Sửa chi tiết ngữ pháp, note lại từ vựng chuyên ngành.",
+            "Đọc: Giới thiệu Part 7 Đoạn ba (Triple Passages). Chiến thuật làm câu nào trước, sau.",
+            "Đọc: Luyện giải 1 bài Part 7 Đoạn ba. Gạch chân thông tin liên kết.",
+            "Nghỉ ngơi cuối tuần.",
+            "Tổng ôn Tháng 2: Đọc lại toàn bộ sổ tay bẫy Part 2 và từ vựng Part 7.",
+            "Buffer Day: Thư giãn, setup lại góc học tập, in sẵn giấy thi (Answer Sheet) cho Tháng 3.",
+
+            // --- THÁNG 3: 30 Ngày ---
+            "SYSTEM TEST: Giải Đề ETS Số 1 (Chỉ làm phần Listening Part 1, 2, 3, 4 - 45 phút).",
+            "DEBUG Đề 1 Nghe: Sửa chi tiết Part 1 & 2. Ghi chép câu sai vào sổ.",
+            "DEBUG Đề 1 Nghe: Sửa chi tiết Part 3 & 4. Học từ vựng đồng nghĩa (Paraphrasing).",
+            "SYSTEM TEST: Giải Đề ETS Số 1 (Chỉ làm phần Reading Part 5, 6, 7 - 75 phút).",
+            "DEBUG Đề 1 Đọc: Sửa Part 5 & 6. Ôn lại lý thuyết câu nào hổng.",
+            "DEBUG Đề 1 Đọc: Sửa Part 7. Chỉ sửa các đoạn đơn và đoạn kép.",
+            "Nghỉ ngơi. Đọc lại sổ tay 'bug' (lỗi sai) của đề 1.",
+            "SYSTEM TEST: Giải Full Đề ETS Số 2 (Ép thời gian đúng 120 phút liên tục).",
+            "DEBUG Đề 2: Chữa toàn bộ phần Listening. Tra cứu kỹ bẫy Part 2.",
+            "DEBUG Đề 2: Chữa toàn bộ phần Reading. Ghi chép từ vựng Part 7.",
+            "Luyện kỹ năng yếu: Làm 30 câu Part 5 chuyên về Từ vựng.",
+            "Luyện kỹ năng yếu: Nghe chép chính tả 3 đoạn Part 3 khó nhất trong Đề 2.",
+            "Ôn tập Từ vựng: Review toàn bộ Anki/Quizlet. Xóa từ cũ, focus từ trong đề ETS.",
+            "Nghỉ ngơi thả lỏng não bộ.",
+            "SYSTEM TEST: Giải Full Đề ETS Số 3 (Mục tiêu: Kéo điểm Reading lên).",
+            "DEBUG Đề 3: Chữa Listening. Áp dụng kỹ năng bắt keyword Part 4.",
+            "DEBUG Đề 3: Chữa Reading. Tập trung giải quyết Part 5 và 6 cực nhanh (15p).",
+            "SYSTEM TEST: Giải Full Đề ETS Số 4.",
+            "DEBUG Đề 4: Chữa Listening. Chú ý giọng Úc/Anh (khó nghe hơn giọng Mỹ).",
+            "DEBUG Đề 4: Chữa Reading. Tối ưu hóa thời gian Part 7, bỏ qua câu quá khó.",
+            "Nghỉ ngơi. Đọc báo tiếng Anh nhẹ nhàng.",
+            "SYSTEM TEST: Giải Full Đề ETS Số 5.",
+            "DEBUG Đề 5: Chữa toàn bộ đề. Đánh giá xem đã đạt mức 50-60 câu đúng / 1 phần chưa.",
+            "SYSTEM TEST: Giải Full Đề ETS Số 6 (Đề chốt sổ).",
+            "DEBUG Đề 6: Chữa toàn bộ đề. Tập trung cao độ vào những lỗi lặp lại.",
+            "Tổng ôn: Xem lại toàn bộ sổ ghi chép lỗi sai (Bug Log) từ Đề 1 đến Đề 6.",
+            "Luyện tâm lý phòng thi: Review mẹo tô trắc nghiệm nhanh, cách canh đồng hồ.",
+            "Làm thủ tục: Xem kỹ lại giấy tờ (CMND/CCCD, ảnh), địa điểm thi.",
+            "Rest Day: Hoàn toàn không học kiến thức mới. Đi ngủ sớm.",
+            "D-DAY: Đi thi thật với trạng thái tự tin nhất. Execute system!"
+        ];
+
+        function renderApp() {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = ''; 
+            
+            let savedProgress = JSON.parse(localStorage.getItem('toeic500_data')) || {};
+            let completedCount = 0;
+            let currentPhase = 0;
+            let phaseGrid;
+
+            exactTasks.forEach((taskDesc, index) => {
+                const dayNum = index + 1;
+                const isChecked = savedProgress[dayNum] || false;
+                if (isChecked) completedCount++;
+
+                // Xác định Phase (mỗi Phase chuẩn 30 ngày)
+                let phaseNum = dayNum <= 30 ? 1 : (dayNum <= 60 ? 2 : 3);
+                
+                if (phaseNum !== currentPhase) {
+                    currentPhase = phaseNum;
+                    const phaseTitles = [
+                        "THÁNG 1: BUILD CORE (Lắp ráp hệ thống & Cú pháp)",
+                        "THÁNG 2: MODULE INTEGRATION (Tích hợp kỹ năng & Format)",
+                        "THÁNG 3: SYSTEM TESTING (Chạy Đề ETS & Fix Bug)"
+                    ];
+                    
+                    const phaseHeading = document.createElement('h2');
+                    phaseHeading.className = `phase-title phase-${currentPhase}`;
+                    phaseHeading.innerText = phaseTitles[currentPhase - 1];
+                    contentDiv.appendChild(phaseHeading);
+
+                    phaseGrid = document.createElement('div');
+                    phaseGrid.className = 'days-grid';
+                    contentDiv.appendChild(phaseGrid);
+                }
+
+                const isRelaxDay = taskDesc.toLowerCase().includes("nghỉ ngơi") || taskDesc.toLowerCase().includes("rest day") || taskDesc.toLowerCase().includes("buffer day");
+
+                const card = document.createElement('div');
+                card.className = `day-card ${isChecked ? 'completed' : ''} ${isRelaxDay ? 'relax-day' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" 
+                            ${isChecked ? 'checked' : ''} 
+                            onchange="toggleDay(${dayNum})">
+                    </div>
+                    <div class="day-content">
+                        <div class="day-title">Day ${dayNum}</div>
+                        <div class="day-task">${taskDesc}</div>
+                    </div>
+                `;
+                
+                phaseGrid.appendChild(card);
+            });
+
+            const totalDays = exactTasks.length; // Sẽ đếm chuẩn 90
+            const percentage = Math.round((completedCount / totalDays) * 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${completedCount} / ${totalDays} Ngày (${percentage}%)`;
+        }
+
+        function toggleDay(dayNum) {
+            let savedProgress = JSON.parse(localStorage.getItem('toeic500_data')) || {};
+            savedProgress[dayNum] = !savedProgress[dayNum];
+            localStorage.setItem('toeic500_data', JSON.stringify(savedProgress));
+            renderApp();
+        }
+
+        function resetProgress() {
+            if(confirm("Bạn có chắc chắn muốn clear toàn bộ dữ liệu (Xóa hết dấu check)?")) {
+                localStorage.removeItem('toeic500_data');
+                renderApp();
+            }
+        }
+
+        // Khởi động
+        renderApp();
+    </script>
+</body>
+</html>
